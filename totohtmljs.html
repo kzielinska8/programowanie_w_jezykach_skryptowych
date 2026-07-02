@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <meta charset="UTF-8">
+  <head>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 40px;
+        font-family: Cambria;
+        background: #bcf5ea
+      }
+
+      input, button {
+        margin: 5px;
+      }
+
+      ul {
+        padding: 0;
+      }
+
+      li {
+        list-style: none;
+        margin: 5px 0 buttons {
+        display: flex;
+        gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  
+  <body>
+  
+    <div class="buttons">
+      <input id="t">
+    </div>
+	
+    <div class="buttons">
+      <button onclick="add()">Dodaj</button>
+      <button onclick="f='all';r()">All</button>
+      <button onclick="f='done';r()">Done</button>
+      <button onclick="f='todo';r()">ToDo</button>
+    </div>
+	
+    <p id="c"></p>
+    <ul id="l"></ul>
+	
+    <script>
+      let d = JSON.parse(localStorage.getItem("t")) || [];
+      let f = "all";
+
+      function s() {
+        localStorage.setItem("t", JSON.stringify(d));
+      }
+
+      function add() {
+        const i = document.getElementById("t");
+        if (!i.value.trim()) return;
+        d.push({
+          id: Date.now(),
+          t: i.value,
+          u: 0
+        });
+        i.value = "";
+        s();
+        r();
+      }
+
+      function del(id) {
+        d = d.filter(x => x.id != id);
+        s();
+        r();
+      }
+
+      function r() {
+        let x = d.filter(v => f == "all" ? 1 : f == "done" ? v.u : !v.u);
+        l.innerHTML = "";
+		
+		x.forEach(v => {
+		l.innerHTML += `
+			<li>
+				<input type="checkbox" ${v.u?"checked":""}
+				onclick="
+				let id=${v.id};
+				let x=d.find(e=>e.id==id);
+				x.u=this.checked; s(); r();
+				">
+        ${v.t}
+        <button onclick="del(${v.id})">X</button>
+      </li>`;
+  });
+  
+        c.innerText = "Do zrobienia: " + d.filter(v => !v.u).length;
+      }
+      r();
+    </script>
+  </body>
+</html>
